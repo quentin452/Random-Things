@@ -66,8 +66,7 @@ public class ServerBloodmoonHandler extends WorldSavedData {
                     setBloodmoon(false);
                 }
             } else {
-                if (time == 12000) {
-                    if (forceBloodMoon || isBloodMoonCycle(date) || Math.random() < Settings.BLOODMOON_CHANCE) {
+                if (time == 12000 && (forceBloodMoon || isBloodMoonCycle(date) || Math.random() < Settings.BLOODMOON_CHANCE)) {
                         forceBloodMoon = false;
                         setBloodmoon(true);
 
@@ -78,7 +77,7 @@ public class ServerBloodmoonHandler extends WorldSavedData {
                                                 .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
                             }
                         }
-                    }
+
                 }
             }
         }

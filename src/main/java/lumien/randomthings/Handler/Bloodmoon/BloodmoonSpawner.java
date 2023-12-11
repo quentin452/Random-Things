@@ -43,7 +43,7 @@ public class BloodmoonSpawner {
      * adds all chunks within the spawn radius of the players to eligibleChunksForSpawning. pars: the world,
      * hostileCreatures, passiveCreatures. returns number of eligible chunks.
      */
-    public int findChunksForSpawning( // TODO excuse me wtf ???
+    public int findChunksForSpawning(
             WorldServer p_77192_1_, boolean p_77192_2_, boolean p_77192_3_, boolean p_77192_4_) {
         if (!p_77192_2_ && !p_77192_3_) {
             return 0;
@@ -94,139 +94,74 @@ public class BloodmoonSpawner {
                     label110: while (iterator.hasNext()) {
                         ChunkCoordIntPair chunkcoordintpair1 = iterator.next();
 
-                        if (!(Boolean) this.eligibleChunksForSpawning.get(chunkcoordintpair1)) {
-                            ChunkPosition chunkposition = func_151350_a(
-                                    p_77192_1_,
-                                    chunkcoordintpair1.chunkXPos,
-                                    chunkcoordintpair1.chunkZPos);
+                        if (Boolean.FALSE.equals(this.eligibleChunksForSpawning.get(chunkcoordintpair1))) {
+                            ChunkPosition chunkposition = func_151350_a(p_77192_1_, chunkcoordintpair1.chunkXPos, chunkcoordintpair1.chunkZPos);
                             int j1 = chunkposition.chunkPosX;
                             int k1 = chunkposition.chunkPosY;
                             int l1 = chunkposition.chunkPosZ;
 
-                            if (!p_77192_1_.getBlock(j1, k1, l1).isNormalCube()
-                                    && p_77192_1_.getBlock(j1, k1, l1).getMaterial()
-                                            == enumcreaturetype.getCreatureMaterial()) {
+                            if (!p_77192_1_.getBlock(j1, k1, l1).isNormalCube() && p_77192_1_.getBlock(j1, k1, l1).getMaterial() == enumcreaturetype.getCreatureMaterial()) {
                                 int i2 = 0;
                                 int j2 = 0;
 
                                 while (j2 < 3) {
-                                    int k2 = j1;
-                                    int l2 = k1;
-                                    int i3 = l1;
-                                    byte b1 = 6;
-                                    BiomeGenBase.SpawnListEntry spawnlistentry = null;
-                                    IEntityLivingData ientitylivingdata = null;
-                                    int j3 = 0;
+                                    int k2 = j1 + p_77192_1_.rand.nextInt(6);
+                                    int i3 = l1 + p_77192_1_.rand.nextInt(6);
 
-                                    while (true) {
-                                        if (j3 < 4) {
-                                            label103: {
-                                                k2 += p_77192_1_.rand.nextInt(b1) - p_77192_1_.rand.nextInt(b1);
-                                                l2 += p_77192_1_.rand.nextInt(1) - p_77192_1_.rand.nextInt(1);
-                                                i3 += p_77192_1_.rand.nextInt(b1) - p_77192_1_.rand.nextInt(b1);
+                                    for (int j3 = 0; j3 < 4; j3++) {
+                                        k2 += p_77192_1_.rand.nextInt(6);
+                                        i3 += p_77192_1_.rand.nextInt(6);
 
-                                                if (p_77192_1_.canBlockSeeTheSky(k2, l2, i3)
-                                                        && canCreatureTypeSpawnAtLocation(
-                                                                enumcreaturetype,
-                                                                p_77192_1_,
-                                                                k2,
-                                                                l2,
-                                                                i3)) {
-                                                    float f = k2 + 0.5F;
-                                                    float f1 = l2;
-                                                    float f2 = i3 + 0.5F;
+                                        if (p_77192_1_.canBlockSeeTheSky(k2, k1, i3) && canCreatureTypeSpawnAtLocation(enumcreaturetype, p_77192_1_, k2, k1, i3)) {
+                                            float f = k2 + 0.5F;
+                                            float f2 = i3 + 0.5F;
 
-                                                    if (p_77192_1_
-                                                            .getClosestPlayer(f, f1, f2, Settings.BLOODMOON_SPAWNRANGE)
-                                                            == null) {
-                                                        float f3 = f - chunkcoordinates.posX;
-                                                        float f4 = f1 - chunkcoordinates.posY;
-                                                        float f5 = f2 - chunkcoordinates.posZ;
-                                                        float f6 = f3 * f3 + f4 * f4 + f5 * f5;
+                                            if (p_77192_1_.getClosestPlayer(f, (float) k1, f2, Settings.BLOODMOON_SPAWNRANGE) == null) {
+                                                float f3 = f - chunkcoordinates.posX;
+                                                float f4 = (float) k1 - chunkcoordinates.posY;
+                                                float f5 = f2 - chunkcoordinates.posZ;
+                                                float f6 = f3 * f3 + f4 * f4 + f5 * f5;
 
-                                                        if (f6 >= 576.0F) {
-                                                            if (spawnlistentry == null) {
-                                                                spawnlistentry = p_77192_1_.spawnRandomCreature(
-                                                                        enumcreaturetype,
-                                                                        k2,
-                                                                        l2,
-                                                                        i3);
+                                                if (f6 >= 576.0F) {
+                                                    BiomeGenBase.SpawnListEntry spawnlistentry = p_77192_1_.spawnRandomCreature(enumcreaturetype, k2, k1, i3);
 
-                                                                if (spawnlistentry == null) {
-                                                                    break label103;
-                                                                }
-                                                            }
+                                                    if (spawnlistentry != null) {
+                                                        try {
+                                                            EntityLiving entityliving = (EntityLiving) spawnlistentry.entityClass.getConstructor(new Class[] { World.class }).newInstance(new Object[] { p_77192_1_ });
+                                                            entityliving.setLocationAndAngles(f, (float) k1, f2, p_77192_1_.rand.nextFloat() * 360.0F, 0.0F);
 
-                                                            EntityLiving entityliving;
-
-                                                            try {
-                                                                entityliving = (EntityLiving) spawnlistentry.entityClass
-                                                                        .getConstructor(new Class[] { World.class })
-                                                                        .newInstance(new Object[] { p_77192_1_ });
-                                                            } catch (Exception exception) {
-                                                                exception.printStackTrace();
-                                                                return i;
-                                                            }
-
-                                                            entityliving.setLocationAndAngles(
-                                                                    f,
-                                                                    f1,
-                                                                    f2,
-                                                                    p_77192_1_.rand.nextFloat() * 360.0F,
-                                                                    0.0F);
-
-                                                            Result canSpawn = ForgeEventFactory.canEntitySpawn(
-                                                                    entityliving,
-                                                                    p_77192_1_,
-                                                                    f,
-                                                                    f1,
-                                                                    f2);
-                                                            if (canSpawn == Result.ALLOW || (canSpawn == Result.DEFAULT
-                                                                    && entityliving.getCanSpawnHere())) {
-                                                                // Bloodmoon Data
+                                                            Result canSpawn = ForgeEventFactory.canEntitySpawn(entityliving, p_77192_1_, f, (float) k1, f2);
+                                                            if (canSpawn == Result.ALLOW || (canSpawn == Result.DEFAULT && entityliving.getCanSpawnHere())) {
                                                                 if (Settings.BLOODMOON_VANISH) {
-                                                                    entityliving.getEntityData()
-                                                                            .setBoolean("bloodmoonSpawned", true);
+                                                                    entityliving.getEntityData().setBoolean("bloodmoonSpawned", true);
                                                                 }
 
                                                                 ++i2;
                                                                 p_77192_1_.spawnEntityInWorld(entityliving);
-                                                                if (!ForgeEventFactory.doSpecialSpawn(
-                                                                        entityliving,
-                                                                        p_77192_1_,
-                                                                        f,
-                                                                        f1,
-                                                                        f2)) {
-                                                                    ientitylivingdata = entityliving
-                                                                            .onSpawnWithEgg(ientitylivingdata);
+                                                                if (!ForgeEventFactory.doSpecialSpawn(entityliving, p_77192_1_, f, (float) k1, f2)) {
+                                                                    entityliving.onSpawnWithEgg(null);
                                                                 }
 
-                                                                if (j2 >= ForgeEventFactory
-                                                                        .getMaxSpawnPackSize(entityliving)) {
+                                                                if (j2 >= ForgeEventFactory.getMaxSpawnPackSize(entityliving)) {
                                                                     continue label110;
                                                                 }
                                                             }
-
-                                                            i += i2;
+                                                        } catch (Exception exception) {
+                                                            exception.printStackTrace();
+                                                            return i;
                                                         }
                                                     }
                                                 }
-
-                                                ++j3;
-                                                continue;
                                             }
                                         }
-
-                                        ++j2;
-                                        break;
                                     }
+                                    ++j2;
                                 }
                             }
                         }
                     }
                 }
             }
-
             return i;
         }
     }
